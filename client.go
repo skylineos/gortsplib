@@ -2008,7 +2008,13 @@ func (c *Client) doSetup(
 			return nil, liberrors.ErrClientTransportHeaderInvalidDelivery{}
 		}
 
-		serverPortsValid := thRes.ServerPorts != nil && !isAnyPort(thRes.ServerPorts[0]) && !isAnyPort(thRes.ServerPorts[1])
+		serverPorts := thRes.ServerPorts
+		serverPortsValid := serverPorts != nil && !isAnyPort(serverPorts[0]) && !isAnyPort(serverPorts[1])
+
+		if !serverPortsValid && medi.RTPPort > 0 && medi.RTPPort < 65535 {
+			serverPorts = &[2]int{medi.RTPPort, medi.RTPPort + 1}
+			serverPortsValid = true
+		}
 
 		if (c.state == clientStatePreRecord || !c.AnyPortEnable) && !serverPortsValid {
 			return nil, liberrors.ErrClientServerPortsNotProvided{}
@@ -2026,24 +2032,24 @@ func (c *Client) doSetup(
 
 		if serverPortsValid {
 			if !c.AnyPortEnable {
-				udpRTPListener.readPort = thRes.ServerPorts[0]
+				udpRTPListener.readPort = serverPorts[0]
 			}
 			udpRTPListener.writeAddr = &net.UDPAddr{
 				IP:   remoteIP,
 				Zone: c.nconn.RemoteAddr().(*net.TCPAddr).Zone,
-				Port: thRes.ServerPorts[0],
+				Port: serverPorts[0],
 			}
 		}
 		udpRTPListener.readIP = remoteIP
 
 		if serverPortsValid {
 			if !c.AnyPortEnable {
-				udpRTCPListener.readPort = thRes.ServerPorts[1]
+				udpRTCPListener.readPort = serverPorts[1]
 			}
 			udpRTCPListener.writeAddr = &net.UDPAddr{
 				IP:   remoteIP,
 				Zone: c.nconn.RemoteAddr().(*net.TCPAddr).Zone,
-				Port: thRes.ServerPorts[1],
+				Port: serverPorts[1],
 			}
 		}
 		udpRTCPListener.readIP = remoteIP

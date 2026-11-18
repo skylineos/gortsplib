@@ -1616,6 +1616,7 @@ func TestClientPlayAnyPort(t *testing.T) {
 		"zero_one",
 		"no",
 		"random",
+		"sdp",
 	} {
 		t.Run(ca, func(t *testing.T) {
 			l, err := net.Listen("tcp", "localhost:8554")
@@ -1659,6 +1660,10 @@ func TestClientPlayAnyPort(t *testing.T) {
 				require.Equal(t, base.Describe, req.Method)
 
 				medias := []*description.Media{testH264Media}
+				sdp := mediasToSDP(medias)
+				if ca == "sdp" {
+					sdp = bytes.Replace(sdp, []byte("m=video 0 "), []byte("m=video 23040 "), 1)
+				}
 
 				err2 = conn.WriteResponse(&base.Response{
 					StatusCode: base.StatusOK,
@@ -1666,7 +1671,7 @@ func TestClientPlayAnyPort(t *testing.T) {
 						"Content-Type": base.HeaderValue{"application/sdp"},
 						"Content-Base": base.HeaderValue{"rtsp://localhost:8554/teststream/"},
 					},
-					Body: mediasToSDP(medias),
+					Body: sdp,
 				})
 				require.NoError(t, err2)
 
@@ -1678,7 +1683,12 @@ func TestClientPlayAnyPort(t *testing.T) {
 				err2 = th.Unmarshal(req.Header["Transport"])
 				require.NoError(t, err2)
 
-				l1a, err2 := net.ListenPacket("udp", "localhost:13344")
+				serverRTPAddress := "localhost:13344"
+				if ca == "sdp" {
+					serverRTPAddress = "localhost:23040"
+				}
+
+				l1a, err2 := net.ListenPacket("udp", serverRTPAddress)
 				require.NoError(t, err2)
 				defer l1a.Close()
 
@@ -1702,6 +1712,9 @@ func TestClientPlayAnyPort(t *testing.T) {
 									return &[2]int{0, 1}
 
 								case "no":
+									return nil
+
+								case "sdp":
 									return nil
 
 								default: // random
@@ -1731,7 +1744,7 @@ func TestClientPlayAnyPort(t *testing.T) {
 				require.NoError(t, err2)
 
 				// read RTCP
-				if ca == "random" {
+				if ca == "random" || ca == "sdp" {
 					// skip firewall opening
 					buf := make([]byte, 2048)
 					_, _, err2 = l1b.ReadFrom(buf)
@@ -1756,7 +1769,8 @@ func TestClientPlayAnyPort(t *testing.T) {
 			packetRecv := make(chan struct{})
 
 			c := Client{
-				AnyPortEnable: true,
+				AnyPortEnable:      ca != "sdp",
+				UDPSourcePortRange: [2]uint16{40000, 40001},
 			}
 
 			var med *description.Media
@@ -1771,7 +1785,7 @@ func TestClientPlayAnyPort(t *testing.T) {
 
 			<-packetRecv
 
-			if ca == "random" {
+			if ca == "random" || ca == "sdp" {
 				err = c.WritePacketRTCP(med, &testRTCPPacket)
 				require.NoError(t, err)
 				<-serverRecv
