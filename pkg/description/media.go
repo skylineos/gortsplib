@@ -74,6 +74,9 @@ type Media struct {
 	// Media type.
 	Type MediaType
 
+	// RTP port from the SDP media description.
+	RTPPort int
+
 	// Media ID (optional).
 	ID string
 
@@ -103,6 +106,7 @@ type Media struct {
 // Unmarshal decodes the media from the SDP format.
 func (m *Media) Unmarshal(md *sdp.MediaDescription) error {
 	m.Type = MediaType(md.MediaName.Media)
+	m.RTPPort = int(md.MediaName.Port.Value)
 
 	m.ID = getAttribute(md.Attributes, "mid")
 	if m.ID != "" && !isAlphaNumeric(m.ID) {

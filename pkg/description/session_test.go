@@ -63,6 +63,7 @@ var casesSession = []struct {
 			Medias: []*description.Media{
 				{
 					Type:    description.MediaTypeVideo,
+					RTPPort: 42504,
 					Control: "rtsp://10.0.100.50/profile5/media.smp/trackID=v",
 					Formats: []format.Format{&format.H264{
 						PayloadTyp:        97,
@@ -73,6 +74,7 @@ var casesSession = []struct {
 				},
 				{
 					Type:    description.MediaTypeAudio,
+					RTPPort: 42506,
 					Control: "rtsp://10.0.100.50/profile5/media.smp/trackID=a",
 					Formats: []format.Format{&format.G711{
 						PayloadTyp:   0,
@@ -82,7 +84,8 @@ var casesSession = []struct {
 					}},
 				},
 				{
-					Type: description.MediaTypeApplication,
+					Type:    description.MediaTypeApplication,
+					RTPPort: 42508,
 					Formats: []format.Format{&format.Generic{
 						PayloadTyp: 107,
 					}},
@@ -134,6 +137,7 @@ var casesSession = []struct {
 			Medias: []*description.Media{
 				{
 					Type:    description.MediaTypeVideo,
+					RTPPort: 42504,
 					Control: "trackID=1",
 					Formats: []format.Format{&format.H264{
 						PayloadTyp:        97,
@@ -144,6 +148,7 @@ var casesSession = []struct {
 				},
 				{
 					Type:    description.MediaTypeAudio,
+					RTPPort: 42506,
 					Control: "trackID=2",
 					Formats: []format.Format{&format.G711{
 						PayloadTyp:   0,
@@ -153,7 +158,8 @@ var casesSession = []struct {
 					}},
 				},
 				{
-					Type: description.MediaTypeApplication,
+					Type:    description.MediaTypeApplication,
+					RTPPort: 42508,
 					Formats: []format.Format{&format.Generic{
 						PayloadTyp: 107,
 					}},
@@ -306,8 +312,9 @@ var casesSession = []struct {
 			Title: ``,
 			Medias: []*description.Media{
 				{
-					ID:   "audio",
-					Type: description.MediaTypeAudio,
+					ID:      "audio",
+					Type:    description.MediaTypeAudio,
+					RTPPort: 9,
 					Formats: []format.Format{
 						&format.Opus{
 							PayloadTyp:   111,
@@ -379,8 +386,9 @@ var casesSession = []struct {
 					},
 				},
 				{
-					ID:   "video",
-					Type: description.MediaTypeVideo,
+					ID:      "video",
+					Type:    description.MediaTypeVideo,
+					RTPPort: 9,
 					Formats: []format.Format{
 						&format.VP8{
 							PayloadTyp: 96,
@@ -466,7 +474,8 @@ var casesSession = []struct {
 			Title: `-`,
 			Medias: []*description.Media{
 				{
-					Type: description.MediaTypeVideo,
+					Type:    description.MediaTypeVideo,
+					RTPPort: 42504,
 					Formats: []format.Format{
 						&format.H264{
 							PayloadTyp: 96,
@@ -600,8 +609,9 @@ var casesSession = []struct {
 			},
 			Medias: []*description.Media{
 				{
-					ID:   "1",
-					Type: description.MediaTypeAudio,
+					ID:      "1",
+					Type:    description.MediaTypeAudio,
+					RTPPort: 30000,
 					Formats: []format.Format{&format.G711{
 						PayloadTyp:   0,
 						MULaw:        true,
@@ -610,8 +620,9 @@ var casesSession = []struct {
 					}},
 				},
 				{
-					ID:   "2",
-					Type: description.MediaTypeApplication,
+					ID:      "2",
+					Type:    description.MediaTypeApplication,
+					RTPPort: 30002,
 					Formats: []format.Format{&format.Generic{
 						PayloadTyp: 100,
 						RTPMa:      "ulpfec/8000",
@@ -619,16 +630,18 @@ var casesSession = []struct {
 					}},
 				},
 				{
-					ID:   "3",
-					Type: description.MediaTypeVideo,
+					ID:      "3",
+					Type:    description.MediaTypeVideo,
+					RTPPort: 30004,
 					Formats: []format.Format{&format.Generic{
 						PayloadTyp: 31,
 						ClockRat:   90000,
 					}},
 				},
 				{
-					ID:   "4",
-					Type: description.MediaTypeApplication,
+					ID:      "4",
+					Type:    description.MediaTypeApplication,
+					RTPPort: 30004,
 					Formats: []format.Format{&format.Generic{
 						PayloadTyp: 101,
 						RTPMa:      "ulpfec/8000",
